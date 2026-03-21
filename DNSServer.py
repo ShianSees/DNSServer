@@ -32,7 +32,7 @@ def generate_aes_key(password, salt):
     return key
 
 # Lookup details on fernet in the cryptography.io documentation    
-def encrypt_with_aes(input_string, qpassword, salt):
+def encrypt_with_aes(input_string, password, salt):
     key = generate_aes_key(password, salt)
     f = Fernet(key)
     encrypted_data = f.encrypt(input_string.encode('utf-8')) #call the Fernet encrypt method
@@ -99,12 +99,12 @@ dns_records = {
         dns.rdatatype.A: '192.168.1.103',
         dns.rdatatype.AAAA:'2607:f8b0:4006:81a::200e',
         dns.rdatatype.MX: [(10, 'mail.google.com.')],
-        dns.rdatatype.CNAME: 'www.google.com',
-        dns.rdatatype.NS: 'ns.google.com',
+        dns.rdatatype.CNAME: 'www.google.com.',
+        dns.rdatatype.NS: 'ns.google.com.',
         dns.rdatatype.TXT: ('This is a TXT record',),
         dns.rdatatype.SOA: (
-            'ns1.google.com', #mname
-            'admin.google.com', #rname
+            'ns1.google.com.', #mname
+            'admin.google.com.', #rname
             886680267,  # serial
             900,  # refresh
             900,  # retry
@@ -116,12 +116,12 @@ dns_records = {
         dns.rdatatype.A: '192.168.1.104',
         dns.rdatatype.AAAA: '2600:1f18:4ae:c605:f094:2a0a:4985:526e',
         dns.rdatatype.MX: [(10, 'mail.legitsite.com.')],
-        dns.rdatatype.CNAME: 'www.legitsite.com',
-        dns.rdatatype.NS: 'nsg1.namebright.com',
+        dns.rdatatype.CNAME: 'www.legitsite.com.',
+        dns.rdatatype.NS: 'nsg1.namebright.com.',
         dns.rdatatype.TXT: ('This is a TXT record',),
         dns.rdatatype.SOA: (
-            'ns1.namebright.com',  # mname
-            'admin.namebright.com',  # rname
+            'ns1.namebright.com.',  # mname
+            'admin.namebright.com.',  # rname
             2026032101,  # serial
             28800,  # refresh
             5000,  # retry
@@ -133,12 +133,12 @@ dns_records = {
         dns.rdatatype.A: '192.168.1.105',
         dns.rdatatype.AAAA: '2001:4998:24:120d::1:1',
         dns.rdatatype.MX: [(10, 'mta7.am0.yahoodns.net.')],
-        dns.rdatatype.CNAME: 'www.yahoo.com',
+        dns.rdatatype.CNAME: 'www.yahoo.com.',
         dns.rdatatype.NS: 'ns1.yahoo.com.',
         dns.rdatatype.TXT: ('This is a TXT record',),
         dns.rdatatype.SOA: (
-            'ns1.yahoo.com',  # mname
-            'admin.yahoo.com',  # rname
+            'ns1.yahoo.com.',  # mname
+            'admin.yahoo.com.',  # rname
             2026032001,  # serial
             3600,  # refresh
             300,  # retry
@@ -150,12 +150,12 @@ dns_records = {
         dns.rdatatype.A: '192.168.1.106',
         dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
         dns.rdatatype.MX: [(10, 'mxa-00256a01.gslb.pphosted.com')],
-        dns.rdatatype.CNAME: 'www.nyu.edu',
-        dns.rdatatype.NS: 'ns4.nyu.net',
+        dns.rdatatype.CNAME: 'www.nyu.edu.',
+        dns.rdatatype.NS: 'ns4.nyu.net.',
         dns.rdatatype.TXT:  (encrypted_value_str,),
         dns.rdatatype.SOA: (
             'ns1.nyu.net.',  # mname
-            'hostmaster.nyu.edu',  # rname
+            'hostmaster.nyu.edu.',  # rname
             2019014197,  # serial
             10800,  # refresh
             3600,  # retry
