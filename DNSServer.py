@@ -18,10 +18,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import base64
 import ast
-from Crypto.Cipher import AES
-
-
-
 
 
 def generate_aes_key(password, salt):
@@ -35,32 +31,36 @@ def generate_aes_key(password, salt):
     key = base64.urlsafe_b64encode(key)
     return key
 
+
 # Lookup details on fernet in the cryptography.io documentation    
 def encrypt_with_aes(input_string, password, salt):
     key = generate_aes_key(password, salt)
     f = Fernet(key)
-    encrypted_data = f.encrypt(input_string.encode('utf-8')) #call the Fernet encrypt method
-    return encrypted_data    
+    encrypted_data = f.encrypt(input_string.encode('utf-8'))  # call the Fernet encrypt method
+    return encrypted_data
+
 
 def decrypt_with_aes(encrypted_data, password, salt):
-    key = generate_aes_key(password, salt)
+    key = generate_aes_key(password,salt)
     f = Fernet(key)
-    decrypted_data = f.decrypt(encrypted_data) #call the Fernet decrypt method
+    decrypted_data = f.decrypt(encrypted_data)  # call the Fernet decrypt method
     return decrypted_data.decode('utf-8')
 
-salt = b'Tandon' # Remember it should be a byte-object
-password = "soc2025@nyu.edu."
+
+salt = b'Tandon'  # Remember it should be a byte-object
+password = "soc2025@nyu.edu"
 input_string = "AlwaysWatching"
 
-encrypted_value = encrypt_with_aes(input_string, password, salt) # exfil function
-decrypted_value = decrypt_with_aes(encrypted_value, password, salt)  # exfil function
-encrypted_value_str = encrypted_value.decode('utf-8')
+encrypted_value = encrypt_with_aes(input_string, password, salt)  #exfil function
+decrypted_value = decrypt_with_aes(encrypted_value, password, salt)  #exfil function
+
 
 # For future use    
 def generate_sha256_hash(input_string):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(input_string.encode('utf-8'))
     return sha256_hash.hexdigest()
+
 
 # A dictionary containing DNS records mapping hostnames to different types of DNS data.
 dns_records = {
@@ -72,15 +72,16 @@ dns_records = {
         dns.rdatatype.NS: 'ns.example.com.',
         dns.rdatatype.TXT: ('This is a TXT record',),
         dns.rdatatype.SOA: (
-            'ns1.example.com.', #mname
-            'admin.example.com.', #rname
-            2023081401, #serial
-            3600, #refresh
-            1800, #retry
-            604800, #expire
-            86400, #minimum
+            'ns1.example.com.',  # mname
+            'admin.example.com.',  # rname
+            2023081401,  # serial
+            3600,  # refresh
+            1800,  # retry
+            604800,  # expire
+            86400,  # minimum
         ),
     },
+
     'safebank.com.': {
         dns.rdatatype.A: '192.168.1.102',
         dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
@@ -101,14 +102,14 @@ dns_records = {
 
     'google.com.': {
         dns.rdatatype.A: '192.168.1.103',
-        dns.rdatatype.AAAA:'2607:f8b0:4006:81a::200e',
+        dns.rdatatype.AAAA: '2607:f8b0:4006:81a::200e',
         dns.rdatatype.MX: [(10, 'mail.google.com.')],
         dns.rdatatype.CNAME: 'www.google.com.',
         dns.rdatatype.NS: 'ns.google.com.',
         dns.rdatatype.TXT: ('This is a TXT record',),
         dns.rdatatype.SOA: (
-            'ns1.google.com.', #mname
-            'admin.google.com.', #rname
+            'ns1.google.com.',  # mname
+            'admin.google.com.',  # rname
             886680267,  # serial
             900,  # refresh
             900,  # retry
@@ -133,7 +134,7 @@ dns_records = {
             10800,  # minimum
         ),
     },
-      'yahoo.com.': {
+    'yahoo.com.': {
         dns.rdatatype.A: '192.168.1.105',
         dns.rdatatype.AAAA: '2001:4998:24:120d::1:1',
         dns.rdatatype.MX: [(10, 'mta7.am0.yahoodns.net.')],
@@ -149,14 +150,14 @@ dns_records = {
             1814400,  # expire
             600,  # minimum
         ),
-      },
-       'nyu.edu.': {
+    },
+    'nyu.edu.': {
         dns.rdatatype.A: '192.168.1.106',
         dns.rdatatype.AAAA: '2001:0db8:85a3:0000:0000:8a2e:0373:7312',
         dns.rdatatype.MX: [(10, 'mxa-00256a01.gslb.pphosted.com')],
         dns.rdatatype.CNAME: 'www.nyu.edu.',
         dns.rdatatype.NS: 'ns1.nyu.edu.',
-        dns.rdatatype.TXT: (f'"{encrypted_value_str}"',),
+        dns.rdatatype.TXT: (encrypted_value,),
         dns.rdatatype.SOA: (
             'ns1.nyu.edu.',  # mname
             'hostmaster.nyu.edu.',  # rname
@@ -165,17 +166,16 @@ dns_records = {
             3600,  # retry
             2419200,  # expire
             900,  # minimum
-
         )
-       }
+}
 
 }
 
 
 def run_dns_server():
     # Create a UDP socket and bind it to the local IP address (what unique IP address is used here, similar to webserver lab) and port (the standard port for DNS)
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Research this
-    server_socket.bind(('127.0.0.1', 53))
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # Research this
+    server_socket.bind(('127.0.0.1', 8053))
 
     while True:
         try:
@@ -202,8 +202,9 @@ def run_dns_server():
                     for pref, server in answer_data:
                         rdata_list.append(MX(dns.rdataclass.IN, dns.rdatatype.MX, pref, server))
                 elif qtype == dns.rdatatype.SOA:
-                    mname, rname, serial, refresh, retry, expire, minimum = answer_data # What is the record format? See dns_records dictionary. Assume we handle @, Class, TTL elsewhere. Do some research on SOA Records
-                    rdata = SOA(dns.rdataclass.IN, dns.rdatatype.SOA, mname,rname,serial, refresh, retry, expire, minimum) # follow format from previous line
+                    mname, rname, serial, refresh, retry, expire, minimum = answer_data  # What is the record format? See dns_records dictionary. Assume we handle @, Class, TTL elsewhere. Do some research on SOA Records
+                    rdata = SOA(dns.rdataclass.IN,
+                                dns.rdatatype.SOA,mname,rname,serial, refresh, retry, expire, minimum)  # follow format from previous line
                     rdata_list.append(rdata)
                 else:
                     if isinstance(answer_data, str):
@@ -245,6 +246,5 @@ def run_dns_server_user():
 
 if __name__ == '__main__':
     run_dns_server_user()
-  #  print("Encrypted Value:", encrypted_value)
-   # print("Decrypted Value:", decrypted_value)
-
+    # print("Encrypted Value:", encrypted_value)
+    # print("Decrypted Value:", decrypted_value)
